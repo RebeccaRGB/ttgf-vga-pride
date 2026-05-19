@@ -57,20 +57,20 @@ async def test_project(dut):
 
     async def check_line(expected_vsync):
         for i in range(H_TOTAL):
-            hsync = (dut.uo_out.value.to_unsigned(resolve=0) >> 7) & 1
-            vsync = (dut.uo_out.value.to_unsigned(resolve=0) >> 3) & 1
+            hsync = (dut.uo_out.value.resolve('random').to_unsigned() >> 7) & 1
+            vsync = (dut.uo_out.value.resolve('random').to_unsigned() >> 3) & 1
             assert hsync == (1 if H_SYNC_START <= i < H_SYNC_END else 0), "Unexpected hsync pattern"
             assert vsync == expected_vsync, "Unexpected vsync pattern"
             await ClockCycles(dut.clk, 1)
 
     async def capture_line(framebuffer, offset):
         for i in range(H_TOTAL):
-            hsync = (dut.uo_out.value.to_unsigned(resolve=0) >> 7) & 1
-            vsync = (dut.uo_out.value.to_unsigned(resolve=0) >> 3) & 1
+            hsync = (dut.uo_out.value.resolve('random').to_unsigned() >> 7) & 1
+            vsync = (dut.uo_out.value.resolve('random').to_unsigned() >> 3) & 1
             assert hsync == (1 if H_SYNC_START <= i < H_SYNC_END else 0), "Unexpected hsync pattern"
             assert vsync == 0, "Unexpected vsync pattern"
             if i < H_DISPLAY:
-                framebuffer[offset+3*i:offset+3*i+3] = palette[dut.uo_out.value.to_unsigned(resolve=0)]
+                framebuffer[offset+3*i:offset+3*i+3] = palette[dut.uo_out.value.resolve('random').to_unsigned()]
             await ClockCycles(dut.clk, 1)
 
     async def skip_frame(frame_num, passed_clocks=0):
