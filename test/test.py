@@ -70,7 +70,7 @@ async def test_project(dut):
             assert hsync == (1 if H_SYNC_START <= i < H_SYNC_END else 0), "Unexpected hsync pattern"
             assert vsync == 0, "Unexpected vsync pattern"
             if i < H_DISPLAY:
-                framebuffer[offset+3*i:offset+3*i+3] = palette[dut.uo_out.value.resolve('random').to_unsigned()]
+                framebuffer[offset+3*i:offset+3*i+3] = palette[dut.uo_out.value.resolve('random').to_unsigned() & 0x77]
             await ClockCycles(dut.clk, 1)
 
     async def skip_frame(frame_num, passed_clocks=0):
