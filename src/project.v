@@ -55,7 +55,9 @@ module tt_um_rebeccargb_vga_pride (
       reset_latch <= 0;
       counter <= 0;
     end else if (ui_in[7:4] != 0) begin
-      reset_latch <= {1, (ui_in[7] | ui_in[6]), (ui_in[7] | ui_in[5])};
+      reset_latch[2] <= 1;
+      reset_latch[1] <= ui_in[7] | ui_in[6];
+      reset_latch[0] <= ui_in[7] | ui_in[5];
     end else if (reset_latch[2]) begin
       case (reset_latch[1:0])
         3: counter <= 0;
