@@ -48,29 +48,37 @@ module tt_um_rebeccargb_vga_pride (
   );
 
   reg [2:0] reset_latch;
-  reg [6:0] counter;
-  wire [6:0] max;
+  reg [5:0] counter;
   always @(posedge clk, negedge rst_n) begin
     if (~rst_n) begin
       reset_latch <= 0;
       counter <= 0;
     end else if (ui_in[7:4] != 0) begin
-      reset_latch[2] <= 1;
-      reset_latch[1] <= ui_in[7] | ui_in[6];
-      reset_latch[0] <= ui_in[7] | ui_in[5];
-    end else if (reset_latch[2]) begin
-      case (reset_latch[1:0])
-        2'b11: counter <= 0;
-        2'b10: counter <= (counter < max) ? (counter + 1) : 0;
-        2'b01: counter <= (counter > 0) ? (counter - 1) : max;
-        2'b00: counter <= uio_in[6:0];
-      endcase
+      if (ui_in[7]) begin
+        reset_latch <= 7;
+      end else if (ui_in[6]) begin
+        reset_latch <= 6;
+      end else if (ui_in[5]) begin
+        reset_latch <= 5;
+      end else if (ui_in[4]) begin
+        reset_latch <= 4;
+      end
+    end else if (reset_latch != 0) begin
+      if (reset_latch == 7) begin
+        counter <= 0;
+      end else if (reset_latch == 6) begin
+        counter <= counter + 1;
+      end else if (reset_latch == 5) begin
+        counter <= counter - 1;
+      end else if (reset_latch == 4) begin
+        counter <= uio_in[5:0];
+      end
       reset_latch <= 0;
     end
   end
 
   wire [5:0] color;
-  flag_index flag((ui_in[0] ? uio_in[6:0] : counter), pix_x, pix_y[8:0], color, max);
+  flag_index flag((ui_in[0] ? uio_in[5:0] : counter), pix_x, pix_y[8:0], color);
 
   assign R = video_active ? color[5:4] : 2'b00;
   assign G = video_active ? color[3:2] : 2'b00;
